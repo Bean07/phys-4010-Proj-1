@@ -1,7 +1,10 @@
-from collections import namedtuple
-import numpy as np
 from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
+from collections     import namedtuple
+
+
+import numpy                as np
+import matplotlib.pyplot    as plt
+import matplotlib.animation as animation
 
 Parameters = namedtuple("Parameters", ["l1", "m1", "l2", "m2", "g"])
 DepVariables = namedtuple("DepVariables", ["th1", "th1d", "th2", "th2d"])
@@ -44,7 +47,9 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     start_idx = 0 if t_start is None else np.searchsorted(sol.t, t_start, side='left')
     end_idx = len(sol.t) if t_end is None else np.searchsorted(sol.t, t_end, side='right')
     sel = slice(start_idx, end_idx)
-
+    
+    global x1, y1, x2, y2
+    
     t = sol.t[sel]
     th1, th1d, th2, th2d = sol.y[:, sel]
     x1 = parameters.l1 * np.sin(th1)
@@ -111,6 +116,16 @@ init_conditions = DepVariables(
     th2d = 0,
 )
 
+
+
+def updateTraj(frame):
+    x_slice = x1[:frame]
+    y_slice = y1[:frame]
+    
+    line.set_data(x_slice, y_slice)
+    return line,
+
+
 t_span = (0.0, 5.0)
 # These are output sampling times; solve_ivp chooses adaptive internal timesteps.
 t_eval = np.linspace(*t_span, 1001)
@@ -121,3 +136,20 @@ sol = solve_ivp(
 )
 print(sol.message)
 make_plots(sol, parameters, t_start=None, t_end=None)
+
+
+
+ani_fig, ax = plt.subplots(dpi=120)
+line, = ax.plot([],[], lw=2, color='crimson')
+ax.set_xlabel("x (m)")
+ax.set_ylabel("y (m)")
+ax.set_title("Trajectories of the Masses in the Double Pendulum System")
+ax.legend()
+ax.set_xlim(-0.5,0.5)
+ax.set_ylim(-1.2,0.1)
+ax.grid()
+
+
+ani = animation.FuncAnimation(ani_fig, updateTraj, frames=len(x1), interval=20, blit=True)
+save_path = "animations/testFig.gif"
+ani.save(save_path, writer='pillow', fps=30)
