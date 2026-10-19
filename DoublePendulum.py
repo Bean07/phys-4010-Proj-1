@@ -119,6 +119,9 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
 # Plot Setup
 ############################################################################################################
     
+# Whether or not to display the static images of the plots.
+draw_plots = True
+
 parameters = Parameters(
     l1 = 0.5,
     m1 = 1.0,
@@ -145,9 +148,6 @@ sol = solve_ivp(
 )
 print(sol.message)
 
-# Whether or not to display the static images of the plots.
-draw_plots = False
-
 make_plots(sol, parameters, t_start=None, t_end=None)
 
 
@@ -157,10 +157,10 @@ make_plots(sol, parameters, t_start=None, t_end=None)
 ############################################################################################################
 
 ### Animation config variables
-make_traj_animation = True
-make_energy_animation = True
-make_state_space_plot_1 = True
-make_state_space_plot_2 = True
+make_traj_animation = False
+make_energy_animation = False
+make_state_space_animation_1 = False
+make_state_space_animation_2 = False
 
 repeat_animation = True
 
@@ -282,7 +282,7 @@ if(make_energy_animation):
     ani2.save(save_path, writer='pillow', fps=fps)
 
 # State-space projection arm 1 plot
-if(make_state_space_plot_1):
+if(make_state_space_animation_1):
     ani_fig3, ax3 = plt.subplots(dpi=120)
     line3,  = ax3.plot([],[], lw=2, color='blue', label="Arm 1")
     point3, = ax3.plot([],[], 'o', color='blue', markersize=4)
@@ -300,7 +300,7 @@ if(make_state_space_plot_1):
     ani3.save(save_path, writer='pillow', fps=fps)
     
 # State-space projection arm 2 plot
-if(make_state_space_plot_2):
+if(make_state_space_animation_2):
     ani_fig4, ax4 = plt.subplots(dpi=120)
     line4,  = ax4.plot([],[], lw=2, color='blue', label="Arm 2")
     point4, = ax4.plot([],[], 'o', color='blue', markersize=4)
