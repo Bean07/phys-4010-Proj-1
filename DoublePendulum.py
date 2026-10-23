@@ -45,7 +45,25 @@ def compute_energy(y, parameters):
 
     return T + U
 
+def compute_energy_arm_1(y, parameters):
+    th1, th1d, th2, th2d = y
+    l1, m1, l2, m2, g = parameters
+    
+    U = m1*g*l1(1-np.cos(th1))
+    
+    T = 0.5*m1*(l1**2)*(th1d**2)
+    
+    return T, U
 
+def compute_energy_arm_2(y, parameters):
+    th1, th1d, th2, th2d = y
+    l1, m1, l2, m2, g = parameters
+    
+    U = m2*g*(l1*(1-np.cos(th1))) + l2*(1-np.cos(th1))
+    
+    T = 0.5*m2*((l1**2)*(th1d**2)+2*l1*l2*th1d*th2d*np.cos(th1-th2)+(l2**2)*(th2d**2))
+    
+    return T, U
 
 ############################################################################################################
 # Plot Generation
@@ -71,6 +89,9 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     energy0 = compute_energy(sol.y[:, 0], parameters)
     energy_scale = ((parameters.m1 + parameters.m2) * parameters.g * parameters.l1
                     + parameters.m2 * parameters.g * parameters.l2)
+    
+    T1, U1 = compute_energy_arm_1(sol.y[:, sel], parameters)
+    T2, U2 = compute_energy_arm_2(sol.y[:, sel], parameters)
     
     if(not draw_plots):
         return
@@ -113,6 +134,26 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     plt.grid()
     plt.show()
     
+    plt.figure(dpi=120)
+    plt.plot(th1, th2, label="Arm 2")
+    plt.xlabel("Theta 1 (rad)")
+    plt.ylabel("Theta 2 (rad)")
+    plt.title("State-Space Projection of Arm 2 in the Double Pendulum System")
+    plt.grid()
+    plt.show()
+    
+    '''
+    plt.figure(dpi=120)
+    plt.plot(th2, th2d, label="Arm 2", color='RED')
+    plt.plot(th2, th2d, label="Arm 2")
+    plt.xlabel("Theta 2 (rad)")
+    plt.ylabel("Theta 2 dot (rad/s)")
+    plt.title("State-Space Projection of Arm 2 in the Double Pendulum System")
+    plt.grid()
+    plt.show()
+    '''
+    
+    
 
 
 ############################################################################################################
@@ -131,13 +172,13 @@ parameters = Parameters(
 )
 
 init_conditions = DepVariables(
-    th1 = 0,
+    th1 = 2.899,
     th1d = 0,
-    th2 = 0.3 * np.pi,
+    th2 = 1.914,
     th2d = 0,
 )
 
-t_span = (0.0, 5.0)
+t_span = (0.0, 20.0)
 # These are output sampling times; solve_ivp chooses adaptive internal timesteps.
 num_points = 1001
 t_eval = np.linspace(*t_span, num_points)
