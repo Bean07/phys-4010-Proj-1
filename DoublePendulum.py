@@ -49,7 +49,7 @@ def compute_energy_arm_1(y, parameters):
     th1, th1d, th2, th2d = y
     l1, m1, l2, m2, g = parameters
     
-    U = m1*g*l1(1-np.cos(th1))
+    U = m1*g*l1*(1-np.cos(th1))
     
     T = 0.5*m1*(l1**2)*(th1d**2)
     
@@ -95,7 +95,22 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     
     if(not draw_plots):
         return
-    
+    # Plot Total Energy vs. Time Graph for Arm 1
+    plt.figure(dpi=120)
+    plt.plot(t,T1+U1 , label="Energy Arm 1")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Total Energy Arm 1")
+    plt.title("Total Energy Arm 1 vs. Time")
+    plt.grid()
+    plt.show()
+    # Plot Total Energy vs. Time Graph for Arm 2
+    plt.figure(dpi=120)
+    plt.plot(t,T2+U2 , label="Energy Arm 2")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Total Energy Arm 2")
+    plt.title("Total Energy Arm 2 vs. Time")
+    plt.grid()
+    plt.show()
     # Plot trajectories of the two masses
     plt.figure(dpi=120)
     plt.plot(x1, y1, label="Mass 1")
@@ -165,19 +180,26 @@ draw_plots = True
 
 parameters = Parameters(
     l1 = 0.5,
-    m1 = 1.0,
+    m1 = 1000,
     l2 = 0.5,
     m2 = 1.0,
     g = 9.8,
 )
 
-init_conditions = DepVariables(
+'''init_conditions = DepVariables(
     th1 = 2.899,
     th1d = 0,
     th2 = 1.914,
     th2d = 0,
 )
-
+'''
+#Initial Conditions for Choatic/High Energy System Exploration: 
+init_conditions = DepVariables(
+    th1 = 2.67,
+    th1d = 0,
+    th2 = 3.12,
+    th2d = 0,
+ )
 t_span = (0.0, 20.0)
 # These are output sampling times; solve_ivp chooses adaptive internal timesteps.
 num_points = 1001
