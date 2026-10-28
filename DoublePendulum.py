@@ -186,7 +186,7 @@ parameters = Parameters(
     m2 = 1.0,
     g = 9.8,
 )
-'''
+
 init_conditions = DepVariables(
     th1 = 0,
     th1d = 0,
@@ -200,6 +200,7 @@ init_conditions = DepVariables(
     th2 = 1.914,
     th2d = 0,
 )
+'''
 '''
 init_conditions = DepVariables(
     th1 = 3,
@@ -217,7 +218,7 @@ init_conditions = DepVariables(
     th2d = 0,
  )
 '''
-t_span = (0.0, 20.0)
+t_span = (0.0, 5.0)
 # These are output sampling times; solve_ivp chooses adaptive internal timesteps.
 num_points = 1001
 t_eval = np.linspace(*t_span, num_points)
@@ -237,10 +238,10 @@ make_plots(sol, parameters, t_start=None, t_end=None)
 ############################################################################################################
 
 ### Animation config variables
-make_traj_animation = True
-make_energy_animation = True
-make_state_space_animation_1 = True
-make_state_space_animation_2 = True
+make_traj_animation = False
+make_energy_animation = False
+make_state_space_animation_1 = False
+make_state_space_animation_2 = False
 
 repeat_animation = True
 
