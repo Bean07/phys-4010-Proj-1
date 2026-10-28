@@ -95,6 +95,7 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     
     if(not draw_plots):
         return
+    
     # Plot Total Energy vs. Time Graph for Arm 1
     plt.figure(dpi=120)
     plt.plot(t,T1+U1 , label="Energy Arm 1")
@@ -103,6 +104,7 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     plt.title("Total Energy Arm 1 vs. Time")
     plt.grid()
     plt.show()
+    
     # Plot Total Energy vs. Time Graph for Arm 2
     plt.figure(dpi=120)
     plt.plot(t,T2+U2 , label="Energy Arm 2")
@@ -111,6 +113,7 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     plt.title("Total Energy Arm 2 vs. Time")
     plt.grid()
     plt.show()
+    
     # Plot trajectories of the two masses
     plt.figure(dpi=120)
     plt.plot(x1, y1, label="Mass 1")
@@ -153,20 +156,9 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
     plt.plot(th1, th2, label="Arm 2")
     plt.xlabel("Theta 1 (rad)")
     plt.ylabel("Theta 2 (rad)")
-    plt.title("State-Space Projection of Arm 2 in the Double Pendulum System")
+    plt.title("Arm 1 angle plotted against Arm 2 angle in the Double Pendulum System")
     plt.grid()
     plt.show()
-    
-    '''
-    plt.figure(dpi=120)
-    plt.plot(th2, th2d, label="Arm 2", color='RED')
-    plt.plot(th2, th2d, label="Arm 2")
-    plt.xlabel("Theta 2 (rad)")
-    plt.ylabel("Theta 2 dot (rad/s)")
-    plt.title("State-Space Projection of Arm 2 in the Double Pendulum System")
-    plt.grid()
-    plt.show()
-    '''
     
     
 
@@ -178,6 +170,7 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
 # Whether or not to display the static images of the plots.
 draw_plots = True
 
+'''
 parameters = Parameters(
     l1 = 0.5,
     m1 = 1000,
@@ -185,13 +178,36 @@ parameters = Parameters(
     m2 = 1.0,
     g = 9.8,
 )
-
-'''init_conditions = DepVariables(
+'''
+parameters = Parameters(
+    l1 = 0.5,
+    m1 = 1.0,
+    l2 = 0.5,
+    m2 = 1.0,
+    g = 9.8,
+)
+'''
+init_conditions = DepVariables(
+    th1 = 0,
+    th1d = 0,
+    th2 = 0.3 * np.pi,
+    th2d = 0,
+)
+'''
+init_conditions = DepVariables(
     th1 = 2.899,
     th1d = 0,
     th2 = 1.914,
     th2d = 0,
 )
+'''
+init_conditions = DepVariables(
+    th1 = 3,
+    th1d = 0,
+    th2 = 1.5,
+    th2d = 0,
+)
+'''
 '''
 #Initial Conditions for Choatic/High Energy System Exploration: 
 init_conditions = DepVariables(
@@ -200,6 +216,7 @@ init_conditions = DepVariables(
     th2 = 3.12,
     th2d = 0,
  )
+'''
 t_span = (0.0, 20.0)
 # These are output sampling times; solve_ivp chooses adaptive internal timesteps.
 num_points = 1001
@@ -220,14 +237,14 @@ make_plots(sol, parameters, t_start=None, t_end=None)
 ############################################################################################################
 
 ### Animation config variables
-make_traj_animation = False
-make_energy_animation = False
-make_state_space_animation_1 = False
-make_state_space_animation_2 = False
+make_traj_animation = True
+make_energy_animation = True
+make_state_space_animation_1 = True
+make_state_space_animation_2 = True
 
 repeat_animation = True
 
-total_duration      = 5  # Total Duration of the animation in [s]
+total_duration      = 20  # Total Duration of the animation in [s]
 loop_delay          = 100 # Delay in gif restart in [ms]
 step_size_per_frame = 5  # How many points to skip per frame, for animation generation performace
 
@@ -254,10 +271,16 @@ def updateTraj(frame):
     lines1[1].set_data(x2_slice, y2_slice)
     
     if frame_index > 0:
-        points1[0].set_data([x1_slice[-1]], [y1_slice[-1]])
-        points1[1].set_data([x2_slice[-1]], [y2_slice[-1]])
+        x1_pos, y1_pos = x1_slice[-1], y1_slice[-1]
+        x2_pos, y2_pos = x2_slice[-1], y2_slice[-1]
+
+        points1[0].set_data([x1_pos], [y1_pos])
+        points1[1].set_data([x2_pos], [y2_pos])
+
+        rods1[0].set_data([0, x1_pos], [0, y1_pos])
+        rods1[1].set_data([x1_pos, x2_pos], [y1_pos, y2_pos])
     
-    return tuple(lines1 + points1)
+    return tuple(lines1 + points1 + rods1)
 
 # Energy error function
 def updateEnergyError(frame):
@@ -313,13 +336,18 @@ if(make_traj_animation):
     lines1 = [line1_1, line1_2]
     points1 = [point1_1, point1_2]
     
+    rod1, = ax1.plot([], [], color='black', lw=1)
+    rod2, = ax1.plot([], [], color='black', lw=1)
+
+    rods1 = [rod1, rod2]
+    
     ax1.plot([0], [0], "ko")  # origin
     ax1.set_xlabel("x (m)")
     ax1.set_ylabel("y (m)")
     ax1.set_title("Trajectories of the Masses in the Double Pendulum System")
     ax1.legend()
-    ax1.set_xlim(-0.45,0.45)
-    ax1.set_ylim(-1.1,0.05)
+    ax1.set_xlim(-1.1,1.1)
+    ax1.set_ylim(-1.1,1.1)
     ax1.grid()
     
     ani1 = animation.FuncAnimation(ani_fig1, updateTraj, frames=num_frames, interval=frame_interval, blit=True, repeat=repeat_animation, repeat_delay=loop_delay)
@@ -336,8 +364,8 @@ if(make_energy_animation):
     ax2.set_xlabel("Time (s)")
     ax2.set_ylabel("(Energy - Initial Energy) / Energy Scale")
     ax2.set_title("Normalized Energy Error of the Double Pendulum System")
-    ax2.set_xlim(-0.3,5.3)
-    ax2.set_ylim(-0.6e-7,4e-7)
+    ax2.set_xlim(-0.3,21)
+    ax2.set_ylim(-2.7e-6,1.1e-6)
     ax2.grid()
     
     ani2 = animation.FuncAnimation(ani_fig2, updateEnergyError, frames=num_frames, interval=frame_interval, blit=True, repeat=repeat_animation, repeat_delay=loop_delay)
@@ -354,8 +382,8 @@ if(make_state_space_animation_1):
     ax3.set_ylabel("Theta 1 dot (rad/s)")
     ax3.set_title("State-Space Projection of Arm 1 in the Double Pendulum System")
     ax3.legend()
-    ax3.set_xlim(-0.7,0.6)
-    ax3.set_ylim(-4,3.5)
+    ax3.set_xlim(-3.1,3.1)
+    ax3.set_ylim(-15,15)
     ax3.grid()
     
     ani3 = animation.FuncAnimation(ani_fig3, updateStateSpace_1, frames=num_frames, interval=frame_interval, blit=True, repeat=repeat_animation, repeat_delay=loop_delay)
@@ -372,8 +400,8 @@ if(make_state_space_animation_2):
     ax4.set_ylabel("Theta 2 dot (rad/s)")
     ax4.set_title("State-Space Projection of Arm 2 in the Double Pendulum System")
     ax4.legend()
-    ax4.set_xlim(-1,1)
-    ax4.set_ylim(-5.5,5.5)
+    ax4.set_xlim(-15,2.5)
+    ax4.set_ylim(-20,20)
     ax4.grid()
     
     ani4 = animation.FuncAnimation(ani_fig4, updateStateSpace_2, frames=num_frames, interval=frame_interval, blit=True, repeat=repeat_animation, repeat_delay=loop_delay)
