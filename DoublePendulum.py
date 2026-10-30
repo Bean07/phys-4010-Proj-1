@@ -168,7 +168,7 @@ def make_plots(sol, parameters, t_start=None, t_end=None):
 ############################################################################################################
     
 # Whether or not to display the static images of the plots.
-draw_plots = True
+draw_plots = False
 
 '''
 parameters = Parameters(
@@ -188,9 +188,9 @@ parameters = Parameters(
 )
 
 init_conditions = DepVariables(
-    th1 = 0,
+    th1 = (0.5 * np.pi),
     th1d = 0,
-    th2 = 0.3 * np.pi,
+    th2 = (0.5 * np.pi),
     th2d = 0,
 )
 '''
@@ -218,7 +218,7 @@ init_conditions = DepVariables(
     th2d = 0,
  )
 '''
-t_span = (0.0, 5.0)
+t_span = (0.0, 1.0)
 # These are output sampling times; solve_ivp chooses adaptive internal timesteps.
 num_points = 1001
 t_eval = np.linspace(*t_span, num_points)
@@ -245,7 +245,7 @@ make_state_space_animation_2 = False
 
 repeat_animation = True
 
-total_duration      = 20  # Total Duration of the animation in [s]
+total_duration      = 5  # Total Duration of the animation in [s]
 loop_delay          = 100 # Delay in gif restart in [ms]
 step_size_per_frame = 5  # How many points to skip per frame, for animation generation performace
 
@@ -348,7 +348,7 @@ if(make_traj_animation):
     ax1.set_title("Trajectories of the Masses in the Double Pendulum System")
     ax1.legend()
     ax1.set_xlim(-1.1,1.1)
-    ax1.set_ylim(-1.1,1.1)
+    ax1.set_ylim(-1.1,0.25)
     ax1.grid()
     
     ani1 = animation.FuncAnimation(ani_fig1, updateTraj, frames=num_frames, interval=frame_interval, blit=True, repeat=repeat_animation, repeat_delay=loop_delay)
